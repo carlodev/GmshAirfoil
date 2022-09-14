@@ -9,3 +9,5 @@
 /t2_0.vtu
 /t2_1.vtu
 /t2_2.vtu
+*.vtu
+*.msh
