@@ -18,7 +18,7 @@ Features:
 Not supported yet:
 - Specify just half profile (eg naca0012)
 
-# <img src="https://github.com/carlodev/Gmsh_Airfoil/blob/master/imgs/all_domain.png" width="1000" title="Example of Mesh generated">
-# <img src="https://github.com/carlodev/Gmsh_Airfoil/blob/master/imgs/Profile1.png" width="1000" title="Detail of Mesh generated">
-# <img src="https://github.com/carlodev/Gmsh_Airfoil/blob/master/imgs/non_sharp.png" width="300" title="Non-Sharp edge">
-# <img src="https://github.com/carlodev/Gmsh_Airfoil/blob/master/imgs/sharp.png" width="300" title="Sharp Edge">
+# <img src="https://github.com/carlodev/Gmsh_Airfoil/blob/master/imgs/all_domain.png" width="50%" title="Example of Mesh generated">
+# <img src="https://github.com/carlodev/Gmsh_Airfoil/blob/master/imgs/Profile1.png" width="65%" title="Detail of Mesh generated">
+# <img src="https://github.com/carlodev/Gmsh_Airfoil/blob/master/imgs/non_sharp.png" width="32.8%" title="Non-Sharp edge">
+# <img src="https://github.com/carlodev/Gmsh_Airfoil/blob/master/imgs/sharp.png"width="32.8%" title="Sharp Edge">
