@@ -1,4 +1,4 @@
-# Airfoil Gmsh
+# AirfoilGmsh
 
 The package is thought to automatize and optimize some procedure for creating structured airfoil meshes using Gmsh.
 The user modifies and then execute the Geo_create.jl file.
