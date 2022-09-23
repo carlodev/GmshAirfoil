@@ -6,6 +6,7 @@ The user provides the .csv file, the length of the chord.
 The user can specify the trailing edge node(s) and where to start for the leading-edge meshing.
 Dimensions and meshing parameters are provided by defualt. The geometry dimensions of the domain and the meshing parameters (number of nodes, and progression) are parameters that can be changed in Gmsh. It is not advisable to change thoose parametrs in the Julia file. 
 
+Prepare the .csv file as in the /test. The points have to be cointinuous, and start form the trailing edge and go to the leading edge and back to the trailing edge.
 It creates .geo file to be opened in Gmsh and generate the mesh.
 
 Features:
