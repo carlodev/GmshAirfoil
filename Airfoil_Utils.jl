@@ -21,7 +21,6 @@ end
 
 function addAirfoilPoints(airfoil_points_list)
     for i = 1:1:(length(airfoil_points_list[:, 1]))
-println(i)
         x = airfoil_points_list[i, 1]
         y = airfoil_points_list[i, 2]
         z = airfoil_points_list[i, 3]
@@ -49,25 +48,17 @@ function addShearPoint(shear_coord)
     
 end
 
-function findOrigin()
-    atol = 1e-4
-    Points
-    x_tmp = Any[]
-    y_tmp = Any[]
-    Points[:][2][2]
-    for i = 1:1:length(Points)
-        push!(x_tmp, Points[:][i][2])
-        push!(y_tmp, Points[:][i][3])
+function findOrigin(Mat)
 
+    leading_edge_idx = []
+    atol = 1e-6
+    while length(leading_edge_idx) != 1
+    vv1 = findall(x -> isapprox(x, 0.0; atol=atol), Mat[:,1])
+    vv2 = findall(x -> isapprox(x, 0.0; atol=atol), Mat[:,2])
+    atol = atol*2
+    leading_edge_idx = vv1[findall(in(vv2),vv1)]
     end
-    
-    
-    vv1 = findall(x -> isapprox(x, 0; atol=atol), x_tmp)
-    vv2 = findall(x -> isapprox(x, 0; atol=atol), y_tmp)
-
-    idx = vv1[findall(in(vv2), vv1)]
-
-    return idx[1]
+    return leading_edge_idx
 end
 
 
@@ -102,22 +93,13 @@ function findLE(d, atol)
 
     vv1 = findall(x -> isapprox(x, d; atol=atol), x_tmp)
 
-    if isempty(vv1)
+    if length(vv1)<2
         vv1 = findLE(d, atol*2)
     end
 
     if length(vv1)>2
-        idx2 = 0
-        d = 0
-
-        for i = 2:1:length(vv1)
-            d_tmp = abs(Points[vv1[1]][3] .- Points[vv1[i]][3])
-            if d_tmp >d
-                d = d_tmp
-                idx2 = i
-            end
-        end
-        vv1 = [vv1[1], idx2]
+            vv1 = findLE(d, atol/3)
+        
     end
 
     vv1
@@ -290,4 +272,54 @@ function addPhysicalSuface(name, surf)
     write(io, str_tmp)
     push!(PhysicalSurface, [nn, surf])
 
+end
+
+
+function formatting_airfoil_points(airfoil_points_list, trailing_edge_point)
+    if airfoil_points_list[1,1] != c
+        error("the file should start from the trailing edge")
+    end
+    
+   
+
+    leading_edge_idx = findOrigin(airfoil_points_list)
+    origin_idx = leading_edge_idx[1]
+    y_idx = airfoil_points_list[origin_idx-1,2]
+
+    atol = 1e-6
+    while isempty(trailing_edge_point)
+        trailing_edge_point= findall(x -> isapprox(x, c; atol=atol), airfoil_points_list[:,1])
+        atol = atol*2
+    end
+    println(trailing_edge_point)
+
+
+        if length(trailing_edge_point)==1
+            sharp_end = true
+            println("sharp edge")
+        elseif length(trailing_edge_point)==2
+            sharp_end = false
+            println("non-shap edge")
+        else
+            error("Impossible to determine the trailing edge, please specify")
+        end
+    
+
+    if  y_idx>0
+        println("anti-clockwise")
+        n_points = length(airfoil_points_list[:,1])
+        println(n_points)
+        if sharp_end
+            airfoil_points_list = vcat(airfoil_points_list[1, :]', airfoil_points_list[end:-1:2 ,:])
+            trailing_edge_point = 1
+            corr = 1
+        else
+            airfoil_points_list = airfoil_points_list[end:-1:1 ,:]
+            corr = 0
+            trailing_edge_point = n_points .+ 1 .- trailing_edge_point
+        end
+        origin_idx = n_points .+ 1 .- origin_idx .+corr 
+    end
+
+    airfoil_points_list, sharp_end, trailing_edge_point, origin_idx
 end

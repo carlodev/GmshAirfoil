@@ -1,10 +1,7 @@
-using FileIO, CSV, DataFrames, XLSX
-include("Airfoil_Utils.jl")
 
-filename = "test/c141.csv"
-clock_wise = false
+function generate_geo_file(file_name; leading_edge_points = [], trailing_edge_point =[], c = 1)
 
-"provide a continuous set of points"
+filename = file_name
 dimesion = 2 #Only 2D supported at the moment
 
 
@@ -12,23 +9,23 @@ C = 6
 L = 6
 c = 1 #chord lenght
 
-leading_edge_points = [] #[237, 211]  #top and bottom points, to identify the leading_edge_points
-d = 0.07*c #for an automatic choice 
+#leading_edge_points = [14, 22] #[237, 211]  #top and bottom points, to identify the leading_edge_points
+d = 0.075*c #for an automatic choice 
 
 
-trailing_edge_point = [] #[1, 35] #if 2 points, a line between them will be created. If 1, sharp leading edge
-
-
-
-
+#trailing_edge_point = [1, 35] #[1, 35] #if 2 points, a line between them will be created. If 1, sharp leading edge
 
 
 
 lc = 1
 name = filename[1:end-4]
 
+global io, airfoil_points_list, Points, Surfaces, Loops, AoA, L, C
+AoA =0
 io = open("$(name)_$(dimesion)D.geo", "w")
 write(io, "SetFactory(\"OpenCASCADE\");\n")
+
+
 
 write(io, "N_inlet = DefineNumber[ 20, Name \"Parameters/N_inlet\" ];\n")
 write(io, "N_vertical = DefineNumber[ 40, Name \"Parameters/N_vertical\" ];\n")
@@ -48,32 +45,12 @@ write(io, "a_dim = 0.2;\n")
 
 
 
+
+
 airfoil_points_list = CSV.File(filename, header=true) |> Tables.matrix
 
-#PreProcessing airfoil_points_list
-airfoil_points_list, sharp_end, trailing_edge_point, origin_idx=formatting_airfoil_points(airfoil_points_list, trailing_edge_point)
-println("shaprend=$sharp_end, trailing_edge_points=$trailing_edge_point, origin_point=$origin_idx")
-
-
-
 addAirfoilPoints(airfoil_points_list)
-
-if isempty(trailing_edge_point) #smart choice of trailing edge if is not specified
-    trailing_edge_point = findTE(c)
-    if length(trailing_edge_point)==1
-        sharp_end = true
-        println("sharp edge")
-    elseif length(trailing_edge_point)==2
-        sharp_end = false
-        println("non-shap edge")
-    else
-        error("Impssible to determine the trailing edge, plase specify")
-    end
-end
-
-
-
-
+origin_idx = findOrigin()
 
 
 if isempty(trailing_edge_point) #smart choice of trailing edge if is not specified
@@ -82,38 +59,22 @@ end
 
 
 if isempty(leading_edge_points)
-    atol = 1e-3
+    atol = 1e-2
     leading_edge_points = findLE(d, atol)
 end
 
-leading_edge_points
 
-Points[leading_edge_points[1]][3]
-
-if Points[leading_edge_points[1]][3] < Points[leading_edge_points[2]][3]
-tmp = leading_edge_points[1]
-leading_edge_points[1]= leading_edge_points[2]
-leading_edge_points[2]= tmp
-end
-
-
-println("leading edge points =$leading_edge_points")
-println("trailing edge points =$trailing_edge_point")
-
+    
 if length(trailing_edge_point) > 1
     sharp_end = false
     idx_sharp = 2
-    println("no sharp edge")
 else
     sharp_end = true
     idx_sharp = 1
-    println("sharp edge")
-
 
 end
-
-
-
+trailing_edge_point[1]
+leading_edge_points[1]
 
 if trailing_edge_point[1]<leading_edge_points[1]
     if sharp_end
@@ -152,40 +113,34 @@ else
 
 end
 #External Domain points
-point1 = addPoint(0, "C", 0)[end][1]
-point2 = addPoint(0, "-C", 0)[end][1]
+point1 = addPoint(0, C, 0)[end][1]
+point2 = addPoint(0, -C, 0)[end][1]
 
-point5 = addPoint("L", "C", 0)[end][1]
-point6 = addPoint("L", "-C", 0)[end][1]
+point5 = addPoint(L, C, 0)[end][1]
+point6 = addPoint(L, -C, 0)[end][1]
 
-point3 = addPoint(c, "C", 0)[end][1]
-point4 = addPoint(c, "-C", 0)[end][1]
+point3 = addPoint(c, C, 0)[end][1]
+point4 = addPoint(c, -C, 0)[end][1]
 
 #Trailing edge point at the rear part
 
 
-
-x_tmp, y_tmp = Points[trailing_edge_point[1]][2:3]
-point7 = addPoint("L", "-L* " * string(x_tmp) * "*Sin(AoA) + " * string(y_tmp) * "*L*Cos(AoA)" ,0)[end][1]
-
-
-"""
 x_c, y_c, z_c = get_coordinate(trailing_edge_point[1])
 t = zeros(1,3)
 t[1, :] = [L; y_c; 0]
 addShearPoint(t)[end][1]
 
 point7 = Points[end][1]
-"""
+
 
 
 if !sharp_end
-    x_tmp, y_tmp = Points[trailing_edge_point[2]][2:3]
-    point8 = addPoint("L", "-L* " * string(x_tmp) * "*Sin(AoA) + " * string(y_tmp) * "*L*Cos(AoA)" ,0)[end][1]
+    x_c, y_c, z_c = get_coordinate(trailing_edge_point[2])
+    t = zeros(1,3)
+    t[1, :] = [L; y_c; 0]
+    addShearPoint(t)[end][1]
 
-
-
-
+    point8 = Points[end][1]
 end
 
 
@@ -309,3 +264,4 @@ end
 
 close(io)
 
+end
