@@ -1,21 +1,12 @@
-using FileIO, CSV, DataFrames, XLSX
-include("Airfoil_Utils.jl")
-
-function create_geofile(filename)
+function create_geofile(filename; leading_edge_points = [], trailing_edge_point =[], chord=1, dimesion=2)
 
 
 "provide a continuous set of points"
-dimesion = 2 #Only 2D supported at the moment
+if dimesion !=2
+    error("Only dimension = 2 supported at the moment")
+end
 
-
-
-c = 1 #chord lenght
-
-leading_edge_points = [] #[237, 211]  #top and bottom points, to identify the leading_edge_points
-d = 0.07*c #for an automatic choice 
-
-
-trailing_edge_point = [] #[1, 35] #if 2 points, a line between them will be created. If 1, sharp leading edge
+d = 0.07*chord #for an automatic choice 
 
 
 
@@ -23,8 +14,10 @@ trailing_edge_point = [] #[1, 35] #if 2 points, a line between them will be crea
 
 
 
-lc = 1
+
+
 name = filename[1:end-4]
+
 global io 
 io = open("$(name)_$(dimesion)D.geo", "w")
 write(io, "SetFactory(\"OpenCASCADE\");\n")
@@ -50,7 +43,7 @@ write(io, "a_dim = 0.2;\n")
 airfoil_points_list = CSV.File(filename, header=true) |> Tables.matrix
 
 #PreProcessing airfoil_points_list
-airfoil_points_list, sharp_end, trailing_edge_point=formatting_airfoil_points(airfoil_points_list, trailing_edge_point, c)
+airfoil_points_list, sharp_end, trailing_edge_point=formatting_airfoil_points(airfoil_points_list, trailing_edge_point, chord)
 println("shaprend=$sharp_end, trailing_edge_points=$trailing_edge_point")
 
 
@@ -58,7 +51,7 @@ println("shaprend=$sharp_end, trailing_edge_points=$trailing_edge_point")
 addAirfoilPoints(airfoil_points_list)
 
 if isempty(trailing_edge_point) #smart choice of trailing edge if is not specified
-    trailing_edge_point = findTE(c)
+    trailing_edge_point = findTE(chord)
     if length(trailing_edge_point)==1
         sharp_end = true
         println("sharp edge")
@@ -74,9 +67,8 @@ end
 
 
 
-
 if isempty(trailing_edge_point) #smart choice of trailing edge if is not specified
-    trailing_edge_point = findTE(c)
+    trailing_edge_point = findTE(chord)
 end
 
 
@@ -85,9 +77,8 @@ if isempty(leading_edge_points)
     leading_edge_points = findLE(d, atol)
 end
 
-leading_edge_points
+println("leading edge points =$leading_edge_points")
 
-Points[leading_edge_points[1]][3]
 
 if Points[leading_edge_points[1]][3] < Points[leading_edge_points[2]][3]
 tmp = leading_edge_points[1]
@@ -157,8 +148,8 @@ point2 = addPoint(0, "-C", 0)[end][1]
 point5 = addPoint("L", "C", 0)[end][1]
 point6 = addPoint("L", "-C", 0)[end][1]
 
-point3 = addPoint(c, "C", 0)[end][1]
-point4 = addPoint(c, "-C", 0)[end][1]
+point3 = addPoint(chord, "C", 0)[end][1]
+point4 = addPoint(chord, "-C", 0)[end][1]
 
 #Trailing edge point at the rear part
 

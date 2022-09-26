@@ -1,8 +1,11 @@
 # AirfoilGmsh
 
 The package is thought to automatize and optimize some procedure for creating structured airfoil meshes using Gmsh.
-The user modifies and then execute the Geo_create.jl file.
+The user can provide directly the .csv file.
+The user can provide the url form "http://airfoiltools.com/" and the csv file will be automatically generated.
+
 The user provides the .csv file, the length of the chord.
+
 The user can specify the trailing edge node(s) and where to start for the leading-edge meshing.
 Dimensions and meshing parameters are provided by defualt. The geometry dimensions of the domain and the meshing parameters (number of nodes, and progression) are parameters that can be changed in Gmsh. It is not advisable to change thoose parametrs in the Julia file. 
 

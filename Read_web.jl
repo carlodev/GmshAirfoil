@@ -1,10 +1,5 @@
-using Chain, DataFrames, CSV, Downloads, FileIO,  XLSX
 
-url = "https://m-selig.ae.illinois.edu/ads/coord/a18.dat"
-url = "https://m-selig.ae.illinois.edu/ads/coord/e1098.dat"
-#url = "https://m-selig.ae.illinois.edu/ads/coord/l188root.dat"
-#url = "https://m-selig.ae.illinois.edu/ads/coord/daytonwrightt1.dat"
-
+function from_url_to_csv(url)
 #Read From the website
 @chain url begin
     Downloads.download(IOBuffer())
@@ -18,8 +13,8 @@ coordinates = Float64[]
 empty_line = -1 #to identify if there is an empty line that distinguish the top from the bottom
 
 for  file_line=1:1:length(s)
-global coordinates 
-global empty_line
+coordinates 
+ empty_line
 
     coordinates_tmp = Float64[]
 
@@ -105,6 +100,5 @@ split_section = split(url[1:end-4], "/")
 profile_name = split_section[end]
 filename = "$profile_name.csv"
 CSV.write(filename, df)
-
-include("Geo_create_fun.jl")
-create_geofile(filename)
+return filename
+end

@@ -93,7 +93,6 @@ function findLE(d, atol)
 
     end
     
-    x_tmp
     
 
     vv1 = findall(x -> isapprox(x, d; atol=atol), x_tmp)
@@ -295,8 +294,6 @@ function formatting_airfoil_points(airfoil_points_list, trailing_edge_point, c)
         trailing_edge_point= findall(x -> isapprox(x, c; atol=atol), airfoil_points_list[:,1])
         atol = atol*2
     end
-    println(trailing_edge_point)
-
 
         if length(trailing_edge_point)==1
             sharp_end = true
@@ -312,7 +309,7 @@ function formatting_airfoil_points(airfoil_points_list, trailing_edge_point, c)
     if  !clockwise
         println("anti-clockwise")
         n_points = length(airfoil_points_list[:,1])
-        println(n_points)
+        println("n points = $n_points")
         if sharp_end
             airfoil_points_list = vcat(airfoil_points_list[1, :]', airfoil_points_list[end:-1:2 ,:])
             trailing_edge_point = 1
