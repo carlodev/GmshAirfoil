@@ -1,23 +1,15 @@
-Points = Any[]
-Lines = Any[]
-Surfaces = Any[]
-Loops = Any[]
+global Points = Any[]
+global Lines = Any[]
+global Surfaces = Any[]
+global Loops = Any[]
 
-PhysicalCurve = Any[]
-PhysicalSurface = Any[]
-
-
+global PhysicalCurve = Any[]
+global PhysicalSurface = Any[]
 
 
-function get_coordinate(p)
-    x = airfoil_points_list[p, 1]
-    y = airfoil_points_list[p, 2]
-    z = airfoil_points_list[p, 3]
-    x_c = x * cos(AoA) + y * sin(AoA)
-    y_c = -1 * x * sin(AoA) + y * cos(AoA)
-    z_c = z
-    return x_c, y_c, z_c
-end
+
+
+
 
 function addAirfoilPoints(airfoil_points_list)
     for i = 1:1:(length(airfoil_points_list[:, 1]))
@@ -51,7 +43,7 @@ end
 function findOrigin(Mat)
 
     leading_edge_idx = []
-    atol = 1e-6
+    atol = 1e-4
     while length(leading_edge_idx) != 1
     vv1 = findall(x -> isapprox(x, 0.0; atol=atol), Mat[:,1])
     vv2 = findall(x -> isapprox(x, 0.0; atol=atol), Mat[:,2])
@@ -61,6 +53,19 @@ function findOrigin(Mat)
     return leading_edge_idx
 end
 
+
+function is_clockwise(Mat)
+    idx_1 = Int(floor(length(Mat[:, 1]) /4))
+    if (Mat[idx_1, 1] - Mat[idx_1+1, 1])<0
+        clockwise = true
+        else
+            clockwise = false
+        end
+
+        return clockwise
+
+
+end
 
 function findTE(c)
     atol = 1e-4
@@ -275,16 +280,15 @@ function addPhysicalSuface(name, surf)
 end
 
 
-function formatting_airfoil_points(airfoil_points_list, trailing_edge_point)
+function formatting_airfoil_points(airfoil_points_list, trailing_edge_point, c)
     if airfoil_points_list[1,1] != c
         error("the file should start from the trailing edge")
     end
-    
    
 
-    leading_edge_idx = findOrigin(airfoil_points_list)
-    origin_idx = leading_edge_idx[1]
-    y_idx = airfoil_points_list[origin_idx-1,2]
+    #leading_edge_idx = findOrigin(airfoil_points_list)
+    clockwise = is_clockwise(airfoil_points_list)
+
 
     atol = 1e-6
     while isempty(trailing_edge_point)
@@ -305,7 +309,7 @@ function formatting_airfoil_points(airfoil_points_list, trailing_edge_point)
         end
     
 
-    if  y_idx>0
+    if  !clockwise
         println("anti-clockwise")
         n_points = length(airfoil_points_list[:,1])
         println(n_points)
@@ -318,8 +322,7 @@ function formatting_airfoil_points(airfoil_points_list, trailing_edge_point)
             corr = 0
             trailing_edge_point = n_points .+ 1 .- trailing_edge_point
         end
-        origin_idx = n_points .+ 1 .- origin_idx .+corr 
     end
 
-    airfoil_points_list, sharp_end, trailing_edge_point, origin_idx
+    airfoil_points_list, sharp_end, trailing_edge_point
 end

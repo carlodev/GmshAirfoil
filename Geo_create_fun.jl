@@ -1,15 +1,14 @@
 using FileIO, CSV, DataFrames, XLSX
 include("Airfoil_Utils.jl")
 
-filename = "test/a18.csv"
-clock_wise = false
+function create_geofile(filename)
+
 
 "provide a continuous set of points"
 dimesion = 2 #Only 2D supported at the moment
 
 
-C = 6
-L = 6
+
 c = 1 #chord lenght
 
 leading_edge_points = [] #[237, 211]  #top and bottom points, to identify the leading_edge_points
@@ -26,7 +25,7 @@ trailing_edge_point = [] #[1, 35] #if 2 points, a line between them will be crea
 
 lc = 1
 name = filename[1:end-4]
-
+global io 
 io = open("$(name)_$(dimesion)D.geo", "w")
 write(io, "SetFactory(\"OpenCASCADE\");\n")
 
@@ -51,8 +50,8 @@ write(io, "a_dim = 0.2;\n")
 airfoil_points_list = CSV.File(filename, header=true) |> Tables.matrix
 
 #PreProcessing airfoil_points_list
-airfoil_points_list, sharp_end, trailing_edge_point, origin_idx=formatting_airfoil_points(airfoil_points_list, trailing_edge_point)
-println("shaprend=$sharp_end, trailing_edge_points=$trailing_edge_point, origin_point=$origin_idx")
+airfoil_points_list, sharp_end, trailing_edge_point=formatting_airfoil_points(airfoil_points_list, trailing_edge_point, c)
+println("shaprend=$sharp_end, trailing_edge_points=$trailing_edge_point")
 
 
 
@@ -169,14 +168,6 @@ x_tmp, y_tmp = Points[trailing_edge_point[1]][2:3]
 point7 = addPoint("L", "-L* " * string(x_tmp) * "*Sin(AoA) + " * string(y_tmp) * "*L*Cos(AoA)" ,0)[end][1]
 
 
-"""
-x_c, y_c, z_c = get_coordinate(trailing_edge_point[1])
-t = zeros(1,3)
-t[1, :] = [L; y_c; 0]
-addShearPoint(t)[end][1]
-
-point7 = Points[end][1]
-"""
 
 
 if !sharp_end
@@ -184,10 +175,10 @@ if !sharp_end
     point8 = addPoint("L", "-L* " * string(x_tmp) * "*Sin(AoA) + " * string(y_tmp) * "*L*Cos(AoA)" ,0)[end][1]
 end
 
-if Points[origin_idx][2:end] != [0.0, 0.0, 0.0]
-    println("new origins")
+
+    println("new origin point")
     origin_idx = addPoint(0, 0, 0)[end][1]
-end
+
 
 circ = addCirc(point2, origin_idx, point1)[end][1]
 
@@ -309,3 +300,4 @@ end
 
 close(io)
 
+end

@@ -1,0 +1,33 @@
+using Chain, DataFrames, CSV, Downloads
+
+@chain "http://homepages.wmich.edu/~hillenbr/voweldata/bigdata.dat" begin
+    Downloads.download(IOBuffer())
+    String(take!(_))
+    _[findfirst("b01ae", _)[1]:end]
+    replace(r" +" => " ")
+    replace(r"\s+$"m => "\n")
+    CSV.read(IOBuffer(_), DataFrame, header = false,
+        missingstring = "0")
+    rename(1:30 .=> [
+        :filename;
+        :duration_msec;
+        Symbol.(["f0", "f1", "f2", "f3"], "_steady");
+        [Symbol(f, "_", p)
+            for p in 10:10:80
+            for f in ["f1", "f2", "f3"]]
+    ])
+    transform(:filename =>
+        ByRow(f -> (
+            type = f[1],
+            number = parse(Int, f[2:3]),
+            vowel = f[4:5]
+        )) => AsTable)
+    transform(:type =>
+        ByRow(t -> Dict(
+            'm' => "man",
+            'w' => "woman",
+            'b' => "boy",
+            'g' => "girl")[t]) => :type)
+    select(1:2, 31:33, 3:30)
+    CSV.write("hillenbrand.csv", _)
+end
