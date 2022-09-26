@@ -19,6 +19,18 @@ d = 0.07*chord #for an automatic choice
 name = filename[1:end-4]
 
 global io 
+global Points = Any[]
+global Lines = Any[]
+global Surfaces = Any[]
+global Loops = Any[]
+
+global PhysicalCurve = Any[]
+global PhysicalSurface = Any[]
+
+
+
+
+
 io = open("$(name)_$(dimesion)D.geo", "w")
 write(io, "SetFactory(\"OpenCASCADE\");\n")
 

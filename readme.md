@@ -1,4 +1,4 @@
-# AirfoilGmsh
+# GmshAirfoil
 
 The package is thought to automatize and optimize some procedure for creating structured airfoil meshes using Gmsh.
 The user can provide directly the .csv file.

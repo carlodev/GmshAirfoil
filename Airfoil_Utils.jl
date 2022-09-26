@@ -1,14 +1,3 @@
-global Points = Any[]
-global Lines = Any[]
-global Surfaces = Any[]
-global Loops = Any[]
-
-global PhysicalCurve = Any[]
-global PhysicalSurface = Any[]
-
-
-
-
 
 
 function addAirfoilPoints(airfoil_points_list)
