@@ -24,8 +24,10 @@ global Lines = Any[]
 global Surfaces = Any[]
 global Loops = Any[]
 
-global PhysicalCurve = Any[]
-global PhysicalSurface = Any[]
+
+
+global PhysicalGroups = DataFrame(number = Int64[], name=String[], entities=Vector[], type=String[])
+
 
 
 
@@ -288,18 +290,49 @@ end
 
 TransfiniteCurve(shear_lines, "N_shear", "P_shear")
 
-
+#Add Physical Groups
 
 if !sharp_end
-TransfiniteSurfaces([1,2,3,4,5,6])
-RecombineSurfaces([1,2,3,4,5,6])
-addPhysicalSuface("fluid", [1,2,3,4,5,6])
+    TransfiniteSurfaces([1,2,3,4,5,6])
+    RecombineSurfaces([1,2,3,4,5,6])
+    addPhysicalGroup("fluid", [1,2,3,4,5,6],"Surface")
 
 else
     TransfiniteSurfaces([1,2,3,4,5])
     RecombineSurfaces([1,2,3,4,5])
-    addPhysicalSuface("fluid", [1,2,3,4,5])
+    addPhysicalGroup("fluid", [1,2,3,4,5],"Surface")
 end
+
+
+#Add Physical Curve
+addPhysicalGroup("airfoil", [spline_airfoil_top, spline_airfoil_bottom, spline_airfoil_le], "Curve")
+
+
+addPhysicalGroup("inlet", [circ], "Curve")
+
+addPhysicalGroup("outlet", [LinefromPoints(point5, point7)], "Curve")
+
+addPhysicalGroup("limits", [LinefromPoints(point1, point3), LinefromPoints(point2, point4), LinefromPoints(point3, point5), LinefromPoints(point4, point6)], "Curve")
+
+
+addPhysicalGroup("airfoil", [leading_edge_points[1], leading_edge_points[2], trailing_edge_point[1]], "Point")
+
+addPhysicalGroup("limits", [point1, point2, point3, point4, point5, point6], "Point")
+
+addPhysicalGroup("outlet", [point7], "Point")
+
+
+if !sharp_end
+    addPhysicalGroup("airfoil", [line_airfoil_te], "Curve"; add = true)
+    addPhysicalGroup("outlet", [LinefromPoints(point7, point8), LinefromPoints(point8, point6)], "Curve"; add = true)
+
+    addPhysicalGroup("airfoil", [trailing_edge_point[2]], "Point"; add = true)
+    addPhysicalGroup("outlet", [point8], "Point"; add = true)    
+else
+    addPhysicalGroup("outlet", [LinefromPoints(point7, point6)], "Curve"; add = true)
+
+end
+
 
 close(io)
 

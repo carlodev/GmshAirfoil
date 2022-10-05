@@ -1,26 +1,34 @@
 # GmshAirfoil
 
-The package is thought to automatize and optimize some procedure for creating structured airfoil meshes using Gmsh.
+The package is thought to automatize and optimize the procedure for creating structured airfoil meshes using Gmsh.
+Features:
+- Generate a csv file from the url from http://airfoiltools.com/
+- Create a .geo file ready to be opened by Gmsh
+- The mesh generated has also physical group: airfoil, inlet, outlet, limits
+- The mesh is compatible with the FEM Gridap
+- It allows to manage both sharp and non-sharp trailing edges
+- AoA, geometry dimensions, number of nodes and progression can be modified in Gmsh
+
+Not supported yet:
+- Specify just half profile (eg naca0012)
+
+### How to use
 The user can provide directly the .csv file.
-The user can provide the url form "http://airfoiltools.com/" and the csv file will be automatically generated.
+The user can provide the url form http://airfoiltools.com/ and the csv file will be automatically generated.
+Example
+```julia
+    url = "https://m-selig.ae.illinois.edu/ads/coord/e1211.dat"
+    filename = from_url_to_csv(url)
+    create_geofile(filename)
+```
 
-The user provides the .csv file, the length of the chord.
-
-The user can specify the trailing edge node(s) and where to start for the leading-edge meshing.
+The user can specify the trailing edge node(s) and where to start for the leading-edge meshing. An automatic detection is implemented.
 Dimensions and meshing parameters are provided by defualt. The geometry dimensions of the domain and the meshing parameters (number of nodes, and progression) are parameters that can be changed in Gmsh. It is not advisable to change thoose parametrs in the Julia file. 
 
 Prepare the .csv file as in the /test. The points have to be cointinuous, and start form the trailing edge and go to the leading edge and back to the trailing edge.
 It creates .geo file to be opened in Gmsh and generate the mesh.
 
-Features:
-- Create a .geo file ready to be opened by Gmsh
-- The mesh generated has also physical group: airfoil, inlet, outlet, limits
-- The mesh is compatible with the FEM Gridap
-- It allows to manage both sharp and non-sharp trailing edges
-- AoA, geometry and meshing parameters can be modified in Gmsh
 
-Not supported yet:
-- Specify just half profile (eg naca0012)
 
 # <img src="https://github.com/carlodev/Gmsh_Airfoil/blob/master/imgs/all_domain.png" width="50%" title="Example of Mesh generated">
 # <img src="https://github.com/carlodev/Gmsh_Airfoil/blob/master/imgs/Profile1.png" width="65%" title="Detail of Mesh generated">

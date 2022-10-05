@@ -26,7 +26,7 @@ function addShearPoint(shear_coord)
     str_tmp = "Point($nn) = {" * x_string * "," * y_string * "," * string(z) * ",a_dim};\n"
     push!(Points, [nn, x, y, z])
     write(io, str_tmp)
-    
+
 end
 
 function findOrigin(Mat)
@@ -34,24 +34,24 @@ function findOrigin(Mat)
     leading_edge_idx = []
     atol = 1e-4
     while length(leading_edge_idx) != 1
-    vv1 = findall(x -> isapprox(x, 0.0; atol=atol), Mat[:,1])
-    vv2 = findall(x -> isapprox(x, 0.0; atol=atol), Mat[:,2])
-    atol = atol*2
-    leading_edge_idx = vv1[findall(in(vv2),vv1)]
+        vv1 = findall(x -> isapprox(x, 0.0; atol=atol), Mat[:, 1])
+        vv2 = findall(x -> isapprox(x, 0.0; atol=atol), Mat[:, 2])
+        atol = atol * 2
+        leading_edge_idx = vv1[findall(in(vv2), vv1)]
     end
     return leading_edge_idx
 end
 
 
 function is_clockwise(Mat)
-    idx_1 = Int(floor(length(Mat[:, 1]) /4))
-    if (Mat[idx_1, 1] - Mat[idx_1+1, 1])<0
+    idx_1 = Int(floor(length(Mat[:, 1]) / 4))
+    if (Mat[idx_1, 1] - Mat[idx_1+1, 1]) < 0
         clockwise = true
-        else
-            clockwise = false
-        end
+    else
+        clockwise = false
+    end
 
-        return clockwise
+    return clockwise
 
 
 end
@@ -63,8 +63,8 @@ function findTE(c)
     for i = 1:1:length(Points)
         push!(x_tmp, Points[:][i][2])
     end
-    
-    
+
+
     vv1 = findall(x -> isapprox(x, c; atol=atol), x_tmp)
 
 
@@ -72,27 +72,27 @@ function findTE(c)
 end
 
 function findLE(d, atol)
-    
+
     x_tmp = Any[]
     y_tmp = Any[]
-   
+
     for i = 1:1:length(Points)
-        push!(x_tmp , Points[:][i][2])
+        push!(x_tmp, Points[:][i][2])
         push!(y_tmp, Points[:][i][3])
 
     end
-    
-    
+
+
 
     vv1 = findall(x -> isapprox(x, d; atol=atol), x_tmp)
 
-    if length(vv1)<2
-        vv1 = findLE(d, atol*2)
+    if length(vv1) < 2
+        vv1 = findLE(d, atol * 2)
     end
 
-    if length(vv1)>2
-            vv1 = findLE(d, atol/3)
-        
+    if length(vv1) > 2
+        vv1 = findLE(d, atol / 3)
+
     end
 
     vv1
@@ -254,25 +254,44 @@ function RecombineSurfaces(surf)
 
 end
 
-function addPhysicalSuface(name, surf)
-    nn = length(PhysicalSurface) + 1
-    str_surf = "$(surf[1])"
 
-    for i = 2:1:length(surf)
-        str_surf = str_surf * ", $(surf[i])"
+
+function addPhysicalGroup(name::String, entities::Vector, type::String; add=false)
+
+    if type != "Point" && type != "Curve" && type != "Surface"
+        error("Type of Physical Group not recognized, available:Point, Curve, Surface")
     end
-    str_tmp = "Physical Surface(\"$name\", $nn) = {$str_surf};"
+
+    str_ent = "$(entities[1])"
+    for i = 2:1:length(entities)
+        str_ent = str_ent * ", $(entities[i])"
+    end
+
+    if add == false
+        nn = size(PhysicalGroups, 1) + 1
+        str_tmp = "Physical $type (\"$name\", $nn) = {$str_ent}; \n"
+        push!(PhysicalGroups, [nn, name, entities, type])
+
+    else
+        f_name = filter(:name => ==(name) , PhysicalGroups)
+        f_type = filter(:type => ==(type) , f_name)
+        nn = f_type.number[1]
+        str_tmp = "Physical $type (\"$name\", $nn) += {$str_ent}; \n"
+        append!(PhysicalGroups.entities[nn], entities)
+
+    end
+    #println(str_tmp)
     write(io, str_tmp)
-    push!(PhysicalSurface, [nn, surf])
 
 end
 
 
+
 function formatting_airfoil_points(airfoil_points_list, trailing_edge_point, c)
-    if airfoil_points_list[1,1] != c
+    if airfoil_points_list[1, 1] != c
         error("the file should start from the trailing edge")
     end
-   
+
 
     #leading_edge_idx = findOrigin(airfoil_points_list)
     clockwise = is_clockwise(airfoil_points_list)
@@ -280,31 +299,31 @@ function formatting_airfoil_points(airfoil_points_list, trailing_edge_point, c)
 
     atol = 1e-6
     while isempty(trailing_edge_point)
-        trailing_edge_point= findall(x -> isapprox(x, c; atol=atol), airfoil_points_list[:,1])
-        atol = atol*2
+        trailing_edge_point = findall(x -> isapprox(x, c; atol=atol), airfoil_points_list[:, 1])
+        atol = atol * 2
     end
 
-        if length(trailing_edge_point)==1
-            sharp_end = true
-            println("sharp edge")
-        elseif length(trailing_edge_point)==2
-            sharp_end = false
-            println("non-shap edge")
-        else
-            error("Impossible to determine the trailing edge, please specify")
-        end
-    
+    if length(trailing_edge_point) == 1
+        sharp_end = true
+        println("sharp edge")
+    elseif length(trailing_edge_point) == 2
+        sharp_end = false
+        println("non-shap edge")
+    else
+        error("Impossible to determine the trailing edge, please specify")
+    end
 
-    if  !clockwise
+
+    if !clockwise
         println("anti-clockwise")
-        n_points = length(airfoil_points_list[:,1])
+        n_points = length(airfoil_points_list[:, 1])
         println("n points = $n_points")
         if sharp_end
-            airfoil_points_list = vcat(airfoil_points_list[1, :]', airfoil_points_list[end:-1:2 ,:])
+            airfoil_points_list = vcat(airfoil_points_list[1, :]', airfoil_points_list[end:-1:2, :])
             trailing_edge_point = 1
             corr = 1
         else
-            airfoil_points_list = airfoil_points_list[end:-1:1 ,:]
+            airfoil_points_list = airfoil_points_list[end:-1:1, :]
             corr = 0
             trailing_edge_point = n_points .+ 1 .- trailing_edge_point
         end
