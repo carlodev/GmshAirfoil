@@ -47,6 +47,8 @@ write(io, "P_shear = DefineNumber[ 1.2, Name \"Parameters/P_shear\" ];\n")
 write(io, "L = DefineNumber[ 6, Name \"Parameters/L\" ];\n")
 write(io, "C = DefineNumber[ 6, Name \"Parameters/C\" ];\n")
 
+write(io, "Refinement_offset = DefineNumber[ 0.5, Name \"Parameters/Refinement_offset\" ];\n")
+
 
 write(io, "AoA_deg = DefineNumber[ 0, Name \"Parameters/AoA\" ];\n")
 write(io, "AoA = AoA_deg*3.14/180;\n")
@@ -58,7 +60,7 @@ airfoil_points_list = CSV.File(filename, header=true) |> Tables.matrix
 
 #PreProcessing airfoil_points_list
 airfoil_points_list, sharp_end, trailing_edge_point=formatting_airfoil_points(airfoil_points_list, trailing_edge_point, chord)
-println("shaprend=$sharp_end, trailing_edge_points=$trailing_edge_point")
+println("sharp te=$sharp_end, trailing_edge_points=$trailing_edge_point")
 
 
 
@@ -178,8 +180,13 @@ if !sharp_end
 end
 
 
-    println("new origin point")
-    origin_idx = addPoint(0, 0, 0)[end][1]
+origin_idx = addPoint(0, 0, 0)[end][1]
+println("new origin point")
+
+#add Refinement points
+
+point1r = addPoint(0, "C", 0)[end][1]
+
 
 
 circ = addCirc(point2, origin_idx, point1)[end][1]
