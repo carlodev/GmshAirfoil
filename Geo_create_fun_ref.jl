@@ -42,18 +42,20 @@ global PhysicalGroups = DataFrame(number = Int64[], name=String[], entities=Vect
 io = open("$(name)_$(dimension)D.geo", "w")
 write(io, "SetFactory(\"OpenCASCADE\");\n")
 
-write(io, "N_inlet = DefineNumber[ 20, Name \"Parameters/N_inlet\" ];\n")
+write(io, "N_inlet = DefineNumber[ 30, Name \"Parameters/N_inlet\" ];\n")
 write(io, "N_vertical = DefineNumber[ 40, Name \"Parameters/N_vertical\" ];\n")
-write(io, "P_vertical = DefineNumber[ 1.15, Name \"Parameters/P_vertical\" ];\n")
+write(io, "P_vertical = DefineNumber[ 1.10, Name \"Parameters/P_vertical\" ];\n")
 
 write(io, "N_airfoil = DefineNumber[ 50, Name \"Parameters/N_airfoil\" ];\n")
 
-write(io, "N_shear = DefineNumber[ 20, Name \"Parameters/N_shear\" ];\n")
-write(io, "P_shear = DefineNumber[ 1.2, Name \"Parameters/P_shear\" ];\n")
+write(io, "N_shear = DefineNumber[ 30, Name \"Parameters/N_shear\" ];\n")
+write(io, "P_shear = DefineNumber[ 1.1, Name \"Parameters/P_shear\" ];\n")
 write(io, "L = DefineNumber[ 6, Name \"Parameters/L\" ];\n")
 write(io, "C = DefineNumber[ 6, Name \"Parameters/C\" ];\n")
 
-write(io, "Refinement_offset = DefineNumber[ 0.5, Name \"Parameters/Refinement_offset\" ];\n")
+write(io, "Refinement_offset = DefineNumber[ 0.35, Name \"Parameters/Refinement_offset\" ];\n")
+write(io, "N_refinement = DefineNumber[ 100, Name \"Parameters/N_refinement\" ];\n")
+write(io, "P_refinement = DefineNumber[ 1.1, Name \"Parameters/P_refinement\" ];\n")
 
 
 write(io, "AoA_deg = DefineNumber[ 0, Name \"Parameters/AoA\" ];\n")
@@ -205,10 +207,10 @@ point7r = addPoint("L", "-L* " * string(x_tmp) * "*Sin(AoA) + " * string(y_tmp) 
 
 if !sharp_end
    x_tmp, y_tmp = Points[trailing_edge_point[2]][2:3]
-   point8r = addPoint("L", "-L* " * string(x_tmp) * "*Sin(AoA) + " * string(y_tmp) * "*L*Cos(AoA) - Refinement_offset" ,0)[end][1]
 
 end
 
+point8r = addPoint("L", "-L* " * string(x_tmp) * "*Sin(AoA) + " * string(y_tmp) * "*L*Cos(AoA) - Refinement_offset" ,0)[end][1]
 point4r = addPoint("$chord*Cos(AoA)", "-$chord* " * string(x_tmp) * "*Sin(AoA) + " * string(y_tmp) * "*$chord*Cos(AoA) - Refinement_offset" ,0)[end][1]
 
 
@@ -245,6 +247,7 @@ else
 
     l6r = addLine(point6, point8r)
     l8t = addLine(point8, trailing_edge_point[2])
+    l3ter = addLine(point4r, trailing_edge_point[2])
 
 end
 l7t = addLine(point7, trailing_edge_point[1])
@@ -256,25 +259,47 @@ l24r = addLine(point2r, point4r)
 l37r = addLine(point3r, point7r)
 l48r = addLine(point4r, point8r)
 
+l11r = addLine(point1, point1r)
+l22r = addLine(point2, point2r)
+l33r = addLine(point3, point3r)
+l44r = addLine(point4, point4r)
 
+l3ter = addLine(point3r, trailing_edge_point[1])
 
-loop1 = LoopfromPoints([point1, leading_edge_points[1], leading_edge_points[2], point2])
-loop2 =LoopfromPoints([point1, point3, trailing_edge_point[1], leading_edge_points[1]])
-loop3 =LoopfromPoints([point2, point4, trailing_edge_point[idx_sharp], leading_edge_points[2]])
-loop4 =LoopfromPoints([point3, point5, point7, trailing_edge_point[1]])
+loop1 = LoopfromPoints([point1, point1r, point2r, point2])
+loop1r = LoopfromPoints([point1r, leading_edge_points[1], leading_edge_points[2], point2r])
+
+loop2 =LoopfromPoints([point1, point3, point3r, point1r])
+loop2r =LoopfromPoints([point1r, point3r, trailing_edge_point[1], leading_edge_points[1]])
+
+loop3 =LoopfromPoints([point2, point4, point4r, point2r])
+loop3r =LoopfromPoints([point2r, point4r, trailing_edge_point[idx_sharp], leading_edge_points[2]])
+
+loop4 =LoopfromPoints([point3, point5, point7r, point3r])
+loop4r =LoopfromPoints([point3r, point7r, point7, trailing_edge_point[1]])
+
+loop5 =LoopfromPoints([point4, point6, point8r, point4r])
 if sharp_end
-    loop5 =LoopfromPoints([point4, point6, point7, trailing_edge_point[idx_sharp]])
+   
+    loop5r =LoopfromPoints([point4r, point8r, point7, trailing_edge_point[idx_sharp]])
+
 else
-    loop5 =LoopfromPoints([point4, point6, point8, trailing_edge_point[idx_sharp]])
+    loop5r =LoopfromPoints([point4r, point8r, point8, trailing_edge_point[idx_sharp]])
+
 
 end
+
 loop1 =  addLoop(loop1)[end][1]
 loop2 = addLoop(loop2)[end][1]
 loop3 = addLoop(loop3)[end][1]
 loop4 = addLoop(loop4)[end][1]
 loop5 = addLoop(loop5)[end][1]
 
-
+loop1r =  addLoop(loop1r)[end][1]
+loop2r = addLoop(loop2r)[end][1]
+loop3r = addLoop(loop3r)[end][1]
+loop4r = addLoop(loop4r)[end][1]
+loop5r = addLoop(loop5r)[end][1]
 
 addPlaneSurface(loop1)
 addPlaneSurface(loop2)
@@ -282,6 +307,11 @@ addPlaneSurface(loop3)
 addPlaneSurface(loop4)
 addPlaneSurface(loop5)
 
+addPlaneSurface(loop1r)
+addPlaneSurface(loop2r)
+addPlaneSurface(loop3r)
+addPlaneSurface(loop4r)
+addPlaneSurface(loop5r)
 
 if !sharp_end
     loop6 =LoopfromPoints([point7, point8, trailing_edge_point[2], trailing_edge_point[1]])
@@ -290,47 +320,69 @@ if !sharp_end
 end
 
 
-leading_edge_lines = [LinefromPoints(point1, point2), LinefromPoints(leading_edge_points[1], leading_edge_points[2])]
+#Transfinite Curves
+
+#Leading Edge
+leading_edge_lines = [LinefromPoints(point1, point2), LinefromPoints(point1r, point2r), LinefromPoints(leading_edge_points[1], leading_edge_points[2])]
 TransfiniteCurve(leading_edge_lines, "N_inlet", 1.)
 
-if sharp_end
-    internal_lines = -1 .*[LinefromPoints(point1, leading_edge_points[1]),
-    LinefromPoints(point3, trailing_edge_point[1]),
-    LinefromPoints(point5, point7),
-    LinefromPoints(point6, point7),
-    -1 .*LinefromPoints(trailing_edge_point[idx_sharp], point4),
-    LinefromPoints(point2, leading_edge_points[2])]
-else
-    internal_lines = -1 .*[LinefromPoints(point1, leading_edge_points[1]),
-    LinefromPoints(point3, trailing_edge_point[1]),
-    LinefromPoints(point5, point7),
-    LinefromPoints(point6, point8),
-    -1 .*LinefromPoints(trailing_edge_point[2], point4),
-    LinefromPoints(point2, leading_edge_points[2])]
-end
 
-
-
-
+#Internal Lines
+internal_lines = -1 .*[LinefromPoints(point1, point1r),
+LinefromPoints(point3, point3r),
+LinefromPoints(point5, point7r),
+LinefromPoints(point6, point8r),
+LinefromPoints(point4, point4r),
+LinefromPoints(point2, point2r)]
 
 TransfiniteCurve(internal_lines, "N_vertical", "P_vertical")
 
 
+#Refinement
+if sharp_end
+    internal_lines = -1 .*[LinefromPoints(point1r, leading_edge_points[1]),
+    LinefromPoints(point3r, trailing_edge_point[1]),
+    LinefromPoints(point7r, point7),
+    LinefromPoints(point8r, point7),
+    -1 .*LinefromPoints(trailing_edge_point[idx_sharp], point4r),
+    LinefromPoints(point2r, leading_edge_points[2])]
+else
+    internal_lines = -1 .*[LinefromPoints(point1r, leading_edge_points[1]),
+    LinefromPoints(point3r, trailing_edge_point[1]),
+    LinefromPoints(point7r, point7),
+    LinefromPoints(point8r, point8),
+    -1 .*LinefromPoints(trailing_edge_point[idx_sharp], point4r),
+    LinefromPoints(point2r, leading_edge_points[2])]
+end
+TransfiniteCurve(internal_lines, "N_refinement", "P_refinement")
+
+
+
+
+
+
+
 airfoil_lines = [LinefromPoints(point1, point3),
+    LinefromPoints(point1r, point3r),
     LinefromPoints(trailing_edge_point[1], leading_edge_points[1]),
     LinefromPoints(trailing_edge_point[idx_sharp], leading_edge_points[2]),
-    LinefromPoints(point2, point4)]
+    LinefromPoints(point2, point4),
+    LinefromPoints(point2r, point4r) ]
 TransfiniteCurve(airfoil_lines, "N_airfoil", 1.)
 
 if sharp_end
-shear_lines = [LinefromPoints(point3, point5),
-LinefromPoints(trailing_edge_point[1], point7),
+    shear_lines = [LinefromPoints(point3, point5),
+    LinefromPoints(point3r, point7r),
+    LinefromPoints(trailing_edge_point[1], point7),
+    LinefromPoints(point4r, point8r),
     LinefromPoints(point4, point6)]
 else
-shear_lines = [LinefromPoints(point3, point5),
-LinefromPoints(trailing_edge_point[1], point7),
+    shear_lines = [LinefromPoints(point3, point5),
+    LinefromPoints(point3r, point7r),
+    LinefromPoints(trailing_edge_point[1], point7),
     LinefromPoints(trailing_edge_point[2], point8),
-     LinefromPoints(point4, point6)]
+    LinefromPoints(point4r, point8r),
+    LinefromPoints(point4, point6)]
 
 trailing_edge_lines = [LinefromPoints(trailing_edge_point[1], trailing_edge_point[2]), LinefromPoints(point7, point8)]
 TransfiniteCurve(trailing_edge_lines, 4, 1.)
@@ -341,14 +393,15 @@ TransfiniteCurve(shear_lines, "N_shear", "P_shear")
 #Add Physical Groups
 
 if !sharp_end
-    TransfiniteSurfaces([1,2,3,4,5,6])
-    RecombineSurfaces([1,2,3,4,5,6])
-    addPhysicalGroup("fluid", [1,2,3,4,5,6],"Surface")
+    TransfiniteSurfaces([1,2,3,4,5,6,7,8,9,10,11])
+    RecombineSurfaces([1,2,3,4,5,6,7,8,9,10,11])
+    addPhysicalGroup("fluid", [1,2,3,4,5,6,7,8,9,10,11],"Surface")
 
 else
-    TransfiniteSurfaces([1,2,3,4,5])
-    RecombineSurfaces([1,2,3,4,5])
-    addPhysicalGroup("fluid", [1,2,3,4,5],"Surface")
+    TransfiniteSurfaces([1,2,3,4,5,6,7,8,9,10])
+    RecombineSurfaces([1,2,3,4,5,6,7,8,9,10])
+    addPhysicalGroup("fluid", [1,2,3,4,5,6,7,8,9,10],"Surface")
+
 end
 
 
@@ -358,7 +411,7 @@ addPhysicalGroup("airfoil", [spline_airfoil_top, spline_airfoil_bottom, spline_a
 
 addPhysicalGroup("inlet", [circ], "Curve")
 
-addPhysicalGroup("outlet", [LinefromPoints(point5, point7)], "Curve")
+addPhysicalGroup("outlet", [LinefromPoints(point5, point7r), LinefromPoints(point7r, point7), LinefromPoints(point6, point8r)], "Curve")
 
 addPhysicalGroup("limits", [LinefromPoints(point1, point3), LinefromPoints(point2, point4), LinefromPoints(point3, point5), LinefromPoints(point4, point6)], "Curve")
 
@@ -367,20 +420,19 @@ addPhysicalGroup("airfoil", [leading_edge_points[1], leading_edge_points[2], tra
 
 addPhysicalGroup("limits", [point1, point2, point3, point4, point5, point6], "Point")
 
-addPhysicalGroup("outlet", [point7], "Point")
+addPhysicalGroup("outlet", [point7, point7r, point8r], "Point")
 
 
 if !sharp_end
     addPhysicalGroup("airfoil", [line_airfoil_te], "Curve"; add = true)
-    addPhysicalGroup("outlet", [LinefromPoints(point7, point8), LinefromPoints(point8, point6)], "Curve"; add = true)
+    addPhysicalGroup("outlet", [LinefromPoints(point7, point8), LinefromPoints(point8, point8r)], "Curve"; add = true)
 
     addPhysicalGroup("airfoil", [trailing_edge_point[2]], "Point"; add = true)
     addPhysicalGroup("outlet", [point8], "Point"; add = true)    
 else
-    addPhysicalGroup("outlet", [LinefromPoints(point7, point6)], "Curve"; add = true)
+    addPhysicalGroup("outlet", [LinefromPoints(point7, point8r)], "Curve"; add = true)
 
 end
 
-"""
 close(io)
 
