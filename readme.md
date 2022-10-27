@@ -2,6 +2,8 @@
 
 The package is thought to automatize and optimize the procedure for creating structured airfoil meshes using Gmsh.
 Features:
+## version 1.0
+
 - Generate a csv file from the url from http://airfoiltools.com/
 - Create a .geo file ready to be opened by Gmsh
 - The mesh generated has also physical group: airfoil, inlet, outlet, limits
@@ -9,8 +11,18 @@ Features:
 - It allows to manage both sharp and non-sharp trailing edges
 - AoA, geometry dimensions, number of nodes and progression can be modified in Gmsh
 
+## version 1.1
+- Create a region close to the airfoil for creating a refinement close to the airfoil
+- You can specify the Reynolds and, if you prefer, the height of the first layer, the software automatically 
+looks for the best combination of number of layers (<150 in the refinement region) and growth ratio
+
+
+
+
+
 Not supported yet:
 - Specify just half profile (eg naca0012)
+- 3D meshes
 
 ### How to use
 The user can provide directly the .csv file.

@@ -1,11 +1,10 @@
-using DataFrames, CSV
-include("Airfoil_Utils.jl")
+function create_geofile_ref(filename; Reynolds = -1, h0 = -1, leading_edge_points = [], trailing_edge_point =[], chord=1, dimension=2)
 
-filename = "test/NACA4412.csv"
-leading_edge_points = []
-trailing_edge_point =[]
-chord=1
-dimension=2
+
+
+Refinement_offset,  N_refinement, P_refinement  =  refinement_parameters(Reynolds, h0, chord)
+
+
 "provide a continuous set of points"
 
 if dimension != 2
@@ -53,9 +52,9 @@ write(io, "P_shear = DefineNumber[ 1.1, Name \"Parameters/P_shear\" ];\n")
 write(io, "L = DefineNumber[ 6, Name \"Parameters/L\" ];\n")
 write(io, "C = DefineNumber[ 6, Name \"Parameters/C\" ];\n")
 
-write(io, "Refinement_offset = DefineNumber[ 0.35, Name \"Parameters/Refinement_offset\" ];\n")
-write(io, "N_refinement = DefineNumber[ 100, Name \"Parameters/N_refinement\" ];\n")
-write(io, "P_refinement = DefineNumber[ 1.1, Name \"Parameters/P_refinement\" ];\n")
+write(io, "Refinement_offset = DefineNumber[ $Refinement_offset, Name \"Parameters/Refinement_offset\" ];\n")
+write(io, "N_refinement = DefineNumber[ $N_refinement, Name \"Parameters/N_refinement\" ];\n")
+write(io, "P_refinement = DefineNumber[ $P_refinement, Name \"Parameters/P_refinement\" ];\n")
 
 
 write(io, "AoA_deg = DefineNumber[ 0, Name \"Parameters/AoA\" ];\n")
@@ -68,7 +67,7 @@ airfoil_points_list = CSV.File(filename, header=true) |> Tables.matrix
 
 #PreProcessing airfoil_points_list
 airfoil_points_list, sharp_end, trailing_edge_point=formatting_airfoil_points(airfoil_points_list, trailing_edge_point, chord)
-println("shaprend=$sharp_end, trailing_edge_points=$trailing_edge_point")
+println("sharp te=$sharp_end, trailing_edge_points=$trailing_edge_point")
 
 
 
@@ -124,6 +123,11 @@ else
     sharp_end = true
     idx_sharp = 1
     println("sharp edge")
+    """
+    if typeof(trailing_edge_point) <: Vector
+        trailing_edge_point = [trailing_edge_point]
+    end
+    """
 end
 
 
@@ -224,8 +228,8 @@ circ = addCirc(point2, origin_idx, point1)[end][1]
 l1 = addLine(point1, point3)
 l2 = addLine(point2, point4)
 l3 = addLine(point3, point5)
-l3t = addLine(point3, trailing_edge_point[1])
-l2t = addLine(point4, trailing_edge_point[idx_sharp])
+l3t = addLine(point3r, trailing_edge_point[1])
+l2t = addLine(point4r, trailing_edge_point[idx_sharp])
 
 
 l4 = addLine(point4, point6)
@@ -240,7 +244,8 @@ l5 = addLine(point5, point7r)
 l5r = addLine(point7r, point7)
 
 if sharp_end
-    l7 = addLine(point7, point6)
+    l7 = addLine(point7, point8r)
+    l7 = addLine(point6, point8r)
 else
     l7 = addLine(point7, point8)
     l8r = addLine(point8, point8r)
@@ -265,6 +270,7 @@ l33r = addLine(point3, point3r)
 l44r = addLine(point4, point4r)
 
 l3ter = addLine(point3r, trailing_edge_point[1])
+l4ter = addLine(point4r, trailing_edge_point[idx_sharp])
 
 loop1 = LoopfromPoints([point1, point1r, point2r, point2])
 loop1r = LoopfromPoints([point1r, leading_edge_points[1], leading_edge_points[2], point2r])
@@ -274,6 +280,8 @@ loop2r =LoopfromPoints([point1r, point3r, trailing_edge_point[1], leading_edge_p
 
 loop3 =LoopfromPoints([point2, point4, point4r, point2r])
 loop3r =LoopfromPoints([point2r, point4r, trailing_edge_point[idx_sharp], leading_edge_points[2]])
+
+LinefromPoints(point8r, point6)
 
 loop4 =LoopfromPoints([point3, point5, point7r, point3r])
 loop4r =LoopfromPoints([point3r, point7r, point7, trailing_edge_point[1]])
@@ -436,3 +444,4 @@ end
 
 close(io)
 
+end

@@ -331,3 +331,5 @@ function formatting_airfoil_points(airfoil_points_list, trailing_edge_point, c)
 
     airfoil_points_list, sharp_end, trailing_edge_point
 end
+
+
