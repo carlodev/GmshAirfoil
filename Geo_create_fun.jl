@@ -80,20 +80,19 @@ end
 
 
 
-
-if isempty(trailing_edge_point) #smart choice of trailing edge if is not specified
+"Smart choice of trailing edge if is not specified"
+if isempty(trailing_edge_point) 
     trailing_edge_point = findTE(chord)
 end
 
-
+"Automatically detect the leading edge points"
 if isempty(leading_edge_points)
     atol = 1e-3
     leading_edge_points = findLE(d, atol)
 end
 
-println("leading edge points =$leading_edge_points")
 
-
+"Re-sort leading edge points, where the vertical line starts"
 if Points[leading_edge_points[1]][3] < Points[leading_edge_points[2]][3]
 tmp = leading_edge_points[1]
 leading_edge_points[1]= leading_edge_points[2]
@@ -112,8 +111,6 @@ else
     sharp_end = true
     idx_sharp = 1
     println("sharp edge")
-
-
 end
 
 
@@ -155,6 +152,8 @@ else
     spline_airfoil_le = addSpline(leading_edge_points[2]: leading_edge_points[1])[end][1] #leading edge
 
 end
+
+
 #External Domain points
 point1 = addPoint(0, "C", 0)[end][1]
 point2 = addPoint(0, "-C", 0)[end][1]
@@ -166,9 +165,7 @@ point3 = addPoint(chord, "C", 0)[end][1]
 point4 = addPoint(chord, "-C", 0)[end][1]
 
 #Trailing edge point at the rear part
-
-
-
+#This allows the shear to rotate as the AoA impose it
 x_tmp, y_tmp = Points[trailing_edge_point[1]][2:3]
 point7 = addPoint("L", "-L* " * string(x_tmp) * "*Sin(AoA) + " * string(y_tmp) * "*L*Cos(AoA)" ,0)[end][1]
 
