@@ -43,7 +43,7 @@ It creates .geo file to be opened in Gmsh and generate the mesh.
 
 
 # <img src="https://github.com/carlodev/Gmsh_Airfoil/blob/master/imgs/all_domain.png" width="50%" title="Example of Mesh generated">
-# <img src="https://github.com/carlodev/Gmsh_Airfoil/blob/master/imgs/Profile1.png" width="65%" title="Detail of Mesh generated">
+# <img src="https://github.com/carlodev/Gmsh_Airfoil/blob/master/imgs/Refinement.png" width="65%" title="Detail of the generated mesh and the refinement close to the airfoil">
 
 <div class="figure" style="text-align: center">
  <img src="https://github.com/carlodev/Gmsh_Airfoil/blob/master/imgs/non_sharp.png" width="32.8%" title="Non-Sharp edge">
