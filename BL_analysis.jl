@@ -1,4 +1,6 @@
 
+#G is the growth ratio
+
 function yt(yh,G,N)
 yh * (1 - G^N)/(1 - G) 
     
@@ -36,7 +38,7 @@ function boundary_layer_characteristics(Re, H, h0)
         G = G - 0.01
     else
         
-        println("Can't find an appropriate G, reducing the inital height")
+        println("Can't find an appropriate growth ratio, reducing the inital height")
         println("h0 = $h0 m")
 
         h0 = h0 - 0.1*h0
@@ -88,6 +90,15 @@ function refinement_parameters(Reynolds, h0, chord)
         end
             H_levels, N_levels, G = boundary_layer_characteristics(Reynolds, H, h0)[1:3]
 
-        return H_levels, N_levels, G
+        return H_levels, N_levels, G, h0
     end
+end
+
+
+function compute_non_sharp_divisions(h0, trailing_edge_point)
+    # h0 first boundary layer cell height
+    d = abs(Points[trailing_edge_point[1]][3] -Points[trailing_edge_point[2]][3] ) #vertical distance between the 2 trailing edge points
+    n = d/h0 + 1
+    n = Int(ceil(n))
+    return n 
 end

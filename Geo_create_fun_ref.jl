@@ -1,8 +1,8 @@
 function create_geofile_ref(filename; Reynolds = -1, h0 = -1, leading_edge_points = [], trailing_edge_point =[], chord=1, dimension=2)
 
+ # h0 first boundary layer cell height
 
-
-Refinement_offset,  N_refinement, P_refinement  =  refinement_parameters(Reynolds, h0, chord)
+Refinement_offset,  N_refinement, P_refinement, h0  =  refinement_parameters(Reynolds, h0, chord)
 
 
 "provide a continuous set of points"
@@ -393,7 +393,11 @@ else
     LinefromPoints(point4, point6)]
 
 trailing_edge_lines = [LinefromPoints(trailing_edge_point[1], trailing_edge_point[2]), LinefromPoints(point7, point8)]
-TransfiniteCurve(trailing_edge_lines, 4, 1.)
+
+n_non_sharp_div = compute_non_sharp_divisions(h0, trailing_edge_point)
+TransfiniteCurve(trailing_edge_lines, n_non_sharp_div, 1.)
+
+
 end
 
 TransfiniteCurve(shear_lines, "N_shear", "P_shear")
