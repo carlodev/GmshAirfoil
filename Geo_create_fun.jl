@@ -1,3 +1,4 @@
+#not up-dated
 function create_geofile(filename; leading_edge_points = [], trailing_edge_point =[], chord=1, dimesion=2)
 
 
@@ -7,12 +8,6 @@ if dimesion !=2
 end
 
 d = 0.07*chord #for an automatic choice 
-
-
-
-
-
-
 
 
 

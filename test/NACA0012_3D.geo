@@ -7,6 +7,8 @@ N_shear = DefineNumber[ 30, Name "Parameters/N_shear" ];
 P_shear = DefineNumber[ 1.2, Name "Parameters/P_shear" ];
 L = DefineNumber[ 6, Name "Parameters/L" ];
 C = DefineNumber[ 6, Name "Parameters/C" ];
+Hz = DefineNumber[ 0.2, Name "Parameters/Hz" ];
+Nz = DefineNumber[ 22, Name "Parameters/Hz" ];
 Refinement_offset = DefineNumber[ 0.35347154991943724, Name "Parameters/Refinement_offset" ];
 N_refinement = DefineNumber[ 45.0, Name "Parameters/N_refinement" ];
 P_refinement = DefineNumber[ 1.18, Name "Parameters/P_refinement" ];
@@ -205,7 +207,11 @@ Transfinite Curve {-13, -9, -17, 19, -10, -15} = N_refinement Using Progression 
 Transfinite Curve {6, 24, -1, 2, 7, 25} = N_airfoil Using Progression 1.0; 
 Transfinite Curve {3, 18} = 17 Using Progression 1.0; 
 Transfinite Curve {8, 26, -22, -21, 27, 11} = N_shear Using Progression P_shear; 
-Transfinite Surface {1};
+Extrude {0, 0, Hz} { 
+
+        Surface{1:11}; Layers {Nz}; Recombine;  
+
+        }Transfinite Surface {1};
 Transfinite Surface {2};
 Transfinite Surface {3};
 Transfinite Surface {4};
@@ -216,20 +222,25 @@ Transfinite Surface {8};
 Transfinite Surface {9};
 Transfinite Surface {10};
 Transfinite Surface {11};
-Physical Surface ("fluid", 1) = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11}; 
-Physical Curve ("airfoil", 2) = {1, 2, 4}; 
-Physical Curve ("inlet", 3) = {5}; 
-Physical Curve ("outlet", 4) = {16, 17, 20}; 
-Physical Curve ("limits", 5) = {6, 7, 8, 11}; 
-Physical Point ("airfoil", 6) = {76, 44, 119}; 
-Physical Point ("limits", 7) = {120, 121, 124, 125, 122, 123}; 
-Physical Point ("outlet", 8) = {126, 132, 133}; 
-Physical Curve ("airfoil", 2) += {3}; 
-Physical Curve ("outlet", 4) += {18, 19}; 
-Physical Point ("airfoil", 6) += {1}; 
-Physical Point ("outlet", 8) += {127}; 
-hz = 1;
-
-Extrude {0, 0, hz} {
-  Surface{1:10}; Layers {11}; Recombine;
-}
+Physical Point ("airfoil", 1) = {1:119}; 
+Physical Point ("outlet", 2) = {133, 126, 127, 132}; 
+Physical Point ("limits", 3) = {121, 125, 123, 120, 124, 122}; 
+Physical Curve ("airofil", 4) = {1, 2, 3, 4, 60, 58, 66, 63}; 
+Physical Curve ("inlet", 5) = {5, 37}; 
+Physical Curve ("limits", 6) = {6, 7, 8, 11, 30, 38, 48, 35, 43, 53}; 
+Physical Curve ("outlet", 7) = {16, 17, 18, 19, 20, 55, 72, 69, 50}; 
+Physical Surface ("inlet", 8) = {15}; 
+Physical Surface ("outlet", 9) = {30, 46, 43, 26, 49}; 
+Physical Surface ("limits", 10) = {21, 29, 17, 25}; 
+Physical Surface ("airfoil", 11) = {34, 41, 38, 50}; 
+Periodic Surface {16} = {1} Translate {0, 0, Hz};
+Periodic Surface {20} = {2} Translate {0, 0, Hz};
+Periodic Surface {24} = {3} Translate {0, 0, Hz};
+Periodic Surface {28} = {4} Translate {0, 0, Hz};
+Periodic Surface {32} = {5} Translate {0, 0, Hz};
+Periodic Surface {36} = {6} Translate {0, 0, Hz};
+Periodic Surface {39} = {7} Translate {0, 0, Hz};
+Periodic Surface {42} = {8} Translate {0, 0, Hz};
+Periodic Surface {45} = {9} Translate {0, 0, Hz};
+Periodic Surface {48} = {10} Translate {0, 0, Hz};
+Periodic Surface {51} = {11} Translate {0, 0, Hz};

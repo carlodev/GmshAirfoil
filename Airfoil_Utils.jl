@@ -29,6 +29,7 @@ function addShearPoint(shear_coord)
 
 end
 
+#not used anymore
 function findOrigin(Mat)
 
     leading_edge_idx = []
@@ -238,7 +239,8 @@ function TransfiniteSurfaces(surf)
 
 end
 
-function RecombineSurfaces(surf)
+function RecombineSurfaces(surf, elements)
+    if elements == :QUAD || elements == :HEX
     str_surf = "$(surf[1])"
 
     for i = 2:1:length(surf)
@@ -250,7 +252,7 @@ function RecombineSurfaces(surf)
     str_tmp = "Recombine Surface {$str_surf}; \n"
     write(io, str_tmp)
 
-
+end
 
 end
 

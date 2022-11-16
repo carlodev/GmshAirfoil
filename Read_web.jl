@@ -99,6 +99,7 @@ df = DataFrame(coordinates, [:x, :y, :z])
 split_section = split(url[1:end-4], "/")
 profile_name = split_section[end]
 filename = "$profile_name.csv"
+#write csv file
 CSV.write(filename, df)
 return filename
 end

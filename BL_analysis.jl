@@ -80,8 +80,8 @@ end
 
 
 function refinement_parameters(Reynolds, h0, chord)
-    if Reynolds <0 0
-        return 0.35, 100, 1.1
+    if Reynolds < 0 && h0 > 0
+        return 0.35, 100, 1.15, h0
     else
         H = 0.35*chord
         if h0 <0
@@ -98,7 +98,7 @@ end
 function compute_non_sharp_divisions(h0, trailing_edge_point)
     # h0 first boundary layer cell height
     d = abs(Points[trailing_edge_point[1]][3] -Points[trailing_edge_point[2]][3] ) #vertical distance between the 2 trailing edge points
-    n = d/h0 + 1
+    n = d/h0 *0.2 + 3 #+3 to ensure is not zero
     n = Int(ceil(n))
     return n 
 end
