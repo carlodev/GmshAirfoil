@@ -2,6 +2,18 @@
 
 The package is thought to automatize and optimize the procedure for creating structured airfoil meshes using Gmsh.
 Features:
+
+## version 1.2
+- Create the 2D mesh with periodic boundaries on Z directionµ
+- You can spacify the type of elements: TRI/TETRA or QUAD/HEX
+
+## version 1.1
+- Create a region close to the airfoil for creating a refinement close to the airfoil
+- You can specify the Reynolds and, if you prefer, the height of the first layer, the software automatically 
+looks for the best combination of number of layers (<150 in the refinement region) and growth ratio
+
+
+
 ## version 1.0
 
 - Generate a csv file from the url from http://airfoiltools.com/
@@ -10,11 +22,6 @@ Features:
 - The mesh is compatible with the FEM Gridap
 - It allows to manage both sharp and non-sharp trailing edges
 - AoA, geometry dimensions, number of nodes and progression can be modified in Gmsh
-
-## version 1.1
-- Create a region close to the airfoil for creating a refinement close to the airfoil
-- You can specify the Reynolds and, if you prefer, the height of the first layer, the software automatically 
-looks for the best combination of number of layers (<150 in the refinement region) and growth ratio
 
 
 
