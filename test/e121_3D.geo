@@ -1,0 +1,17 @@
+SetFactory("OpenCASCADE");
+N_inlet = DefineNumber[ 30, Name "Parameters/N_inlet" ];
+N_vertical = DefineNumber[ 30, Name "Parameters/N_vertical" ];
+P_vertical = DefineNumber[ 1.10, Name "Parameters/P_vertical" ];
+N_airfoil = DefineNumber[ 50, Name "Parameters/N_airfoil" ];
+N_shear = DefineNumber[ 30, Name "Parameters/N_shear" ];
+P_shear = DefineNumber[ 1.2, Name "Parameters/P_shear" ];
+L = DefineNumber[ 6, Name "Parameters/L" ];
+C = DefineNumber[ 6, Name "Parameters/C" ];
+Hz = DefineNumber[ 0.2, Name "Parameters/Hz" ];
+Nz = DefineNumber[ 22, Name "Parameters/Nz" ];
+Refinement_offset = DefineNumber[ 0.35347154991943724, Name "Parameters/Refinement_offset" ];
+N_refinement = DefineNumber[ 45.0, Name "Parameters/N_refinement" ];
+P_refinement = DefineNumber[ 1.18, Name "Parameters/P_refinement" ];
+AoA_deg = DefineNumber[ 0, Name "Parameters/AoA" ];
+AoA = AoA_deg*3.14/180;
+a_dim = 0.2;

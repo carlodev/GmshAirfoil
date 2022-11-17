@@ -1,26 +1,9 @@
-using FileIO, CSV, DataFrames, XLSX
-using Chain, Downloads
-using Gridap, GridapGmsh
-include("Read_web.jl")
-include("map_lines.jl")
-include("Airfoil_Utils.jl")
-include("BL_analysis.jl")
-include("Geo_create_fun.jl")
-include("Geo_create_fun_ref.jl")
 
 
-#function create_geofile_ref(filename; Reynolds = -1, h0 = -1, leading_edge_points = [], trailing_edge_point =[], chord=1, dimension=2, elements = :QUAD)
+function main_create_geofile(filename; Reynolds = -1, h0 = -1, leading_edge_points = [], trailing_edge_point =[], chord=1, dimension=2, elements = :QUAD)
 
 # h0 first boundary layer cell height
 
-filename = "test/e1211.csv"
-Reynolds = 600_000
-h0 = -1
-leading_edge_points = []
-trailing_edge_point = []
-chord = 1
-dimension = 3
-elements = :QUAD
 
 Refinement_offset, N_refinement, P_refinement, h0 = refinement_parameters(Reynolds, h0, chord)
 
@@ -445,35 +428,15 @@ else
 
 end
 
+if dimension == 2
+    #Recombine and transfinite surfaces
+if !sharp_end
+   addPhysicalGroup("fluid", [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11], "Surface")
 
-
-#Extrude the z0 layer
-N_surf = length(Surfaces)
-if recombine
-    extr_vol = "Extrude {0, 0, Hz} {
-        Surface{1:$(N_surf)}; Layers {Nz}; Recombine; 
-}\n"
 else
-    extr_vol = "Extrude {0, 0, Hz} {
-    Surface{1:$(N_surf)}; Layers {Nz}; 
-}\n"
-
+    addPhysicalGroup("fluid", [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], "Surface")
 
 end
-extr_vol = extr_vol * "Physical Volume(\"fluid\", 100) = {1:$N_surf}; \n Physical Surface(\"zm\", 101) = {1:$N_surf}; \n"
-
-write(io, extr_vol)
-
-
-
-
-map_lines_and_points(N_airfoil_points, sharp_end)
-
-
-close(io)
-"""
-
-
 #Add Physical Curve
 addPhysicalGroup("airfoil", [spline_airfoil_top, spline_airfoil_bottom, spline_airfoil_le], "Curve")
 
@@ -502,7 +465,35 @@ else
     addPhysicalGroup("outlet", [LinefromPoints(point7, point8r)], "Curve"; add=true)
 
 end
-"""
+
+elseif dimension == 3
+    #Extrude the z0 layer
+N_surf = length(Surfaces)
+if recombine
+    extr_vol = "Extrude {0, 0, Hz} {
+        Surface{1:$(N_surf)}; Layers {Nz}; Recombine; 
+}\n"
+else
+    extr_vol = "Extrude {0, 0, Hz} {
+    Surface{1:$(N_surf)}; Layers {Nz}; 
+}\n"
 
 
-#end
+end
+extr_vol = extr_vol * "Physical Volume(\"fluid\", 100) = {1:$N_surf}; \n Physical Surface(\"zm\", 101) = {1:$N_surf}; \n"
+
+write(io, extr_vol)
+
+
+map_entities(N_airfoil_points, sharp_end)
+
+end
+
+
+
+
+
+close(io)
+
+
+end

@@ -239,8 +239,8 @@ function TransfiniteSurfaces(surf)
 
 end
 
-function RecombineSurfaces(surf, elements)
-    if elements == :QUAD || elements == :HEX
+function RecombineSurfaces(surf, recombine)
+    if recombine
     str_surf = "$(surf[1])"
 
     for i = 2:1:length(surf)
@@ -252,7 +252,7 @@ function RecombineSurfaces(surf, elements)
     str_tmp = "Recombine Surface {$str_surf}; \n"
     write(io, str_tmp)
 
-end
+    end
 
 end
 

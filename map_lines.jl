@@ -1,5 +1,6 @@
-#function map_lines_and_points(N_airfoil_points, sharp_end)
+function map_entities(N_airfoil_points, sharp_end)
 
+folder_files = "Maps3D"
 
 if sharp_end
     sheet = "Sharp"
@@ -7,22 +8,20 @@ else
     sheet = "NonSharp"
 end
 
-periodicmap = DataFrame(XLSX.readtable("Periodic_Surfaces.xlsx", sheet))
+periodicmap = DataFrame(XLSX.readtable(joinpath(folder_files,"Periodic_Surfaces.xlsx") , sheet))
 
-points_phyisical_map = DataFrame(XLSX.readtable("PointsPhysical.xlsx", sheet))
-lines_phyisical_map = DataFrame(XLSX.readtable("LinesPhysical.xlsx", sheet))
-surfaces_phyisical_map = DataFrame(XLSX.readtable("SurfacesPhysical.xlsx", sheet))
+points_phyisical_map = DataFrame(XLSX.readtable(joinpath(folder_files, "PointsPhysical.xlsx") , sheet))
+lines_phyisical_map = DataFrame(XLSX.readtable(joinpath(folder_files, "LinesPhysical.xlsx") , sheet))
+surfaces_phyisical_map = DataFrame(XLSX.readtable(joinpath(folder_files, "SurfacesPhysical.xlsx") , sheet))
 
 
 points_phyisical = Vector[]
-addPhysicalGroup("airfoil", [1:N_airfoil_points], "Point")
-
 for i = 1:1:size(points_phyisical_map)[1]
 
     points_tmp = Int[]
     a = split(points_phyisical_map.Points[i], ", ")
     for  j = 1:1:length(a)
-        push!(points_tmp, Base.parse(Int, a[j]))
+        push!(points_tmp, Base.parse(Int, a[j])+ N_airfoil_points)
 
     end
     
@@ -81,5 +80,5 @@ for i = 1:1:size(periodicmap)[1]
 end
 
 
-close(io)
-#end
+
+end
